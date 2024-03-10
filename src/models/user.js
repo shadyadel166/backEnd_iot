@@ -22,13 +22,13 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: [12, "Password must be at least 8 characters long"],
+    minlength: [12, "Password must be at least 12 characters long"],
     maxlength: [128, "Password must be less than 128 characters long"],
-    validate: {
-      validator: (v) => {
-        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
-      }
-    },
+    // validate: {
+    //   validator: (v) => {
+    //     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
+    //   }
+    // },
   },
   phoneNumber: {
     type: String,

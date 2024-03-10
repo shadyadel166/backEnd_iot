@@ -48,7 +48,7 @@ route.get("/allBlog/:id", async (req, res) => {
     res.json({
       massage: "get blog by id",
       status: 200,
-      data: exist,
+      data: data,
       success: true,
     });
   } else {
@@ -111,11 +111,12 @@ route.get("/allBlog/:author", async (req, res) => {
 
 route.post("/addBlog", upload.single("image"), async (req, res) => {
   let img;
-  if (req.file) {
-    this.img = "http://localhost:5000/default.png";
-  } else {
-    img = await blogController.getImageBlog(req.file);
-  }
+if (req.file) {
+  img = "http://localhost:5000/default.png";
+} else {
+  img = await blogController.getImageBlog(req.file);
+}
+
   let blog = new blogModel({
     title: req.body.title,
     body: req.body.body,

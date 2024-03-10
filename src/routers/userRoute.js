@@ -150,6 +150,58 @@ route.delete("/delete/:id", verifyToken, async function (req, res) {
   });
 });
 
+//*********************** get all user******************************************************* */
+route.get("/getAll", async function (req, res) {
+  const user = await userController.getAllUser();
+  res.json({
+    massage:"all users",
+    status:200,
+    data:user,
+    success:true
 
+  })
+})
+//********************************* get user by id ******************************************** */
+route.get("/getById/:id", async function (req, res) {
+  let exist=await userController.check_email(req.params.id);
+  if(exist){
+    let data=await userController.getUserById(req.params.id);
+    res.json({
+      message:"user found",
+      status:200,
+      data:data,
+      success:true
+    })
+  }else{
+    res.json({
+      message:"user not found",
+      status:400,
+      success:false,
+    })
+
+  }
+})
+
+//************************* get user by gmail*************************************** */
+route.get("/getByEmail/:email", async function (req, res) {
+  let exist=await userController.check_email(req.params.email);
+  if(exist){
+    let data=await userController.getUserByEmail(req.params.email);
+    res.json({
+      message:"user found",
+      status:200,
+      data:data,
+      success:true
+    })
+  }else{
+    res.json({
+      message:"user not found",
+      status:400,
+      success:false,
+    })
+
+  }
+
+})
 
 module.exports=route;
