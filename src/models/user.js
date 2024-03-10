@@ -17,17 +17,28 @@ const userSchema = new mongoose.Schema({
       message: "Please fill a valid email address",
     },
     unique: true,
+    index: true,
   },
   password: {
     type: String,
     required: true,
     minlength: [12, "Password must be at least 8 characters long"],
     maxlength: [128, "Password must be less than 128 characters long"],
+    validate: {
+      validator: (v) => {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
+      }
+    },
   },
   phoneNumber: {
     type: String,
     required: true,
     maxlength: 11,
+    validate: {
+      validator: (v) => {
+        return /^[0-9]{11}$/.test(v);
+      }
+    },
   },
   joineDate: {
     type: Date,
@@ -36,6 +47,13 @@ const userSchema = new mongoose.Schema({
   nationalId: {
     type: String,
     maxlength: 14,
+    validate: {
+      validator: (v) => {
+        return /^[0-9]{14}$/.test(v);
+      }
+    },
+    index: true,
+  
   },
   wishLike:{
     type:Array,

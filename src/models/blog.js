@@ -5,7 +5,8 @@ const mongoose =require('mongoose');
 const blogSchema = new mongoose.Schema({
     title:{
         type:String,
-        required:true
+        required:true,
+        index:true,
     },
     body:{
         type:String,
@@ -26,8 +27,10 @@ const blogSchema = new mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
+        index:true,
     }
 
 })
+blogSchema.index({ userId: 1, title: 1 });
 
 module.exports = mongoose.model('Blog',blogSchema);
