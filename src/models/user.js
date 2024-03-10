@@ -47,11 +47,6 @@ const userSchema = new mongoose.Schema({
   nationalId: {
     type: String,
     maxlength: 14,
-    validate: {
-      validator: (v) => {
-        return /^[0-9]{14}$/.test(v);
-      }
-    },
     index: true,
   
   },

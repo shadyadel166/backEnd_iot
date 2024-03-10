@@ -33,8 +33,9 @@ route.post("/register", async function (req, res) {
         success: false,
       });
     } else {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+     
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      req.body.password = hashedPassword
       let new_user = await userController.register(req.body);
       res.json({
         message: "Successfull regestration go to sign in",
