@@ -5,7 +5,7 @@ const userModel=require('../models/user')
 //******************  Update user   ************ */
 
 async function updateUser(id,newData){
-let  userUpdated= await userModel.userUpdated({_id:id},newData)
+let  userUpdated= await userModel.updateOne({_id:id},newData)
 return userUpdated;
 }
 
@@ -13,7 +13,7 @@ return userUpdated;
 //************************ deleteUser  *********************************** */
 
 async function deleteUser(id){
-    let userDeleted= await userModel.userDeleted({_id:id})
+    let userDeleted= await userModel.deleteOne({_id:id})
 return userDeleted;
 }
 

@@ -4,6 +4,8 @@ const route = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { verifyToken } = require("../shared/auth");
+const fs = require("fs");
+let secret= fs.readFileSync("secret.key");
 
 //************* register **************************************************** */
 
@@ -50,6 +52,7 @@ route.post("/register", async function (req, res) {
 //***************************** login ***************************************************** */
 
 route.post("/login", async function (req, res) {
+  console.log(req.body);
   const user = await userController.getUserByEmail(req.body.email);
 
   if (!user) {
@@ -65,8 +68,8 @@ route.post("/login", async function (req, res) {
       user.password
     );
     if (isValidPassword) {
-      const secret = process.env.secret;
       jwt.sign({ user }, secret, (err, token) => {
+        console.log(token);
         res.json({
           message: "Login Successfully",
           status: 200,
@@ -120,7 +123,7 @@ route.post("/update", verifyToken, async function (req, res) {
 
 //******************** delete user ***************************************** */
 route.delete("/delete/:id", verifyToken, async function (req, res) {
-  jwt.verify(req.token, process.env.secret, async (err, data) => {
+  jwt.verify(req.token, secret, async (err, data) => {
     if (err) {
       res.json({
         message: "Error:invalid credentials , on token found",
@@ -130,8 +133,8 @@ route.delete("/delete/:id", verifyToken, async function (req, res) {
       });
     } else {
       let id = data.user._id;
-      let user = await userController.deleteUser(id);
-      if (user) {
+      let user = await userController.deleteUser(req.params.id);
+      if (user.deletedCount>0) {
         res.json({
           message: "user deleted successfully",
           status: 200,
@@ -154,7 +157,7 @@ route.delete("/delete/:id", verifyToken, async function (req, res) {
 route.get("/getAll", async function (req, res) {
   const user = await userController.getAllUser();
   res.json({
-    massage:"all users",
+    message:"all users",
     status:200,
     data:user,
     success:true
