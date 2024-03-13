@@ -63,7 +63,7 @@ route.get("/allBlog/:id", async (req, res) => {
 
 //*************************get all blog by title ********************************************* */
 
-route.get("/allBlog/:title", async (req, res) => {
+route.get("/getBlogByTitle/:title", async (req, res) => {
     let exist = await blogController.isBlogExist(req.params.title);
   if (exist) {
     let data = await blogController.getBlogByTitle(req.params.title);
@@ -83,6 +83,15 @@ route.get("/allBlog/:title", async (req, res) => {
   }
 }
 )
+
+
+// routes/blogRoutes.js
+
+// Import necessary modules and controllers
+
+// Route for searching blog by title
+
+
 
 //************************* get all blog by author******************************************* */
 
@@ -111,12 +120,13 @@ route.get("/allBlog/:author", async (req, res) => {
 
 route.post("/addBlog", upload.single("image"), async (req, res) => {
   let img;
-if (req.file) {
+if (!req.file) {
   img = "http://localhost:5000/default.png";
 } else {
   img = await blogController.getImageBlog(req.file);
 }
-
+console.log(req.file);
+console.log(req.body);
   let blog = new blogModel({
     title: req.body.title,
     body: req.body.body,
@@ -161,7 +171,7 @@ if(!existBlog){
     }
 
     try{
-        blog=await blogModel.findById(req.params.id).then((blog)=>{
+         blogModel.findById(req.params.id).then((blog)=>{
             blog.title=req.body.title;
             blog.body=req.body.body;
             blog.image=img;

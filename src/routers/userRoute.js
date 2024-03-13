@@ -52,7 +52,6 @@ route.post("/register", async function (req, res) {
 //***************************** login ***************************************************** */
 
 route.post("/login", async function (req, res) {
-  console.log(req.body);
   const user = await userController.getUserByEmail(req.body.email);
 
   if (!user) {
@@ -68,15 +67,15 @@ route.post("/login", async function (req, res) {
       user.password
     );
     if (isValidPassword) {
-      jwt.sign({ user }, secret, (err, token) => {
-        console.log(token);
+     const token = jwt.sign({ user }, secret, (secret, { expiresIn: '1h' } ) )
         res.json({
           message: "Login Successfully",
           status: 200,
           success: true,
+
           data: { user: user, token: token },
+
         });
-      });
     } else {
       res.json({
         message: "Error:invalid credentials , password incorrect",
@@ -90,8 +89,8 @@ route.post("/login", async function (req, res) {
 
 // ****************** update User ************************************************** */
 
-route.post("/update", verifyToken, async function (req, res) {
-  jwt.verify(req.token, process.env.secret, async (err, data) => {
+route.put("/update/:id", verifyToken, async function (req, res) {
+  jwt.verify(req.token, secret, async (err, data) => {
     if (err) {
       res.json({
         message: "Error:invalid credentials , on token found",
@@ -100,8 +99,10 @@ route.post("/update", verifyToken, async function (req, res) {
         success: false,
       });
     } else {
-      let id = data.user._id;
-      let user = await userController.updateUser(id, req.body);
+      // let id = data.user._id;
+      console.log(req.body);
+      console.log(req.params.id);
+      let user = await userController.updateUser(req.params.id, req.body);
       if (user) {
         res.json({
           message: "user updated successfully",

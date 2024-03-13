@@ -53,7 +53,7 @@ async function getBlogByID(id){
 //******************* get blog by title ************************************* */
 
 async function getBlogByTitle(title){
-    let blogByTitle=await blogModel.find({title:title});
+    let blogByTitle=await blogModel.find({ title: { $regex: title, $options: "i" } });
     return blogByTitle;
 
 }
@@ -66,6 +66,14 @@ return blogByUerId;
 }
 
 
+
+
+
+
+
+
+
+
 module.exports={
     updateBlog,
     deleteBlog,
@@ -75,6 +83,6 @@ module.exports={
     getBlogByTitle,
     getBlogByAuthor,
     getImageBlog,
-    isBlogExist
+    isBlogExist,
 }
 
