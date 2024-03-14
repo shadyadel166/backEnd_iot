@@ -208,4 +208,22 @@ route.get("/getByEmail/:email", async function (req, res) {
 
 })
 
+//************************** search user  ************************************************** */
+
+route.get('/search/:query', async (req, res) => {
+  const query = req.params.query;
+  try {
+    const users = await userController.searchUsers(query); 
+    res.json({
+      success: true,
+      data: users
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
 module.exports=route;

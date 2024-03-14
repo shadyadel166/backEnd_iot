@@ -1,4 +1,5 @@
-const userModel=require('../models/user')
+const userModel=require('../models/user');
+const { search } = require('../routers/userRoute');
 
 
 
@@ -56,6 +57,25 @@ async function getAllUser(){
 let users = await userModel.find()
 return users
 }
+// *************** search user************************************************************
+async function searchUsers(query) {
+    try {
+        const users = await userModel.find({
+            $or: [
+                { fullName: { $regex: search, $options: 'i' } }, 
+                { email: { $regex: search, $options: 'i' } },   
+            ]
+        });
+        return users;
+    } catch (error) {
+        console.error('Error searching users:', error);
+        throw error;
+    }
+}
+
+
+
+
 
 module.exports={
     updateUser,
@@ -64,5 +84,6 @@ module.exports={
     register,
     getUserByEmail,
     getUserByID,
-    getAllUser
+    getAllUser,
+    searchUsers,
 }
