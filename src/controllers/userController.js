@@ -77,6 +77,7 @@ async function searchUsers(query) {
 
 
 
+
 module.exports={
     updateUser,
     deleteUser,
@@ -86,4 +87,5 @@ module.exports={
     getUserByID,
     getAllUser,
     searchUsers,
+   
 }
