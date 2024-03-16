@@ -60,11 +60,10 @@ route.get("/allBlog/:id", async (req, res) => {
   }
 });
 
-
 //*************************get all blog by title ********************************************* */
 
 route.get("/getBlogByTitle/:title", async (req, res) => {
-    let exist = await blogController.isBlogExist(req.params.title);
+  let exist = await blogController.isBlogExist(req.params.title);
   if (exist) {
     let data = await blogController.getBlogByTitle(req.params.title);
 
@@ -81,9 +80,7 @@ route.get("/getBlogByTitle/:title", async (req, res) => {
       success: false,
     });
   }
-}
-)
-
+});
 
 // routes/blogRoutes.js
 
@@ -91,12 +88,10 @@ route.get("/getBlogByTitle/:title", async (req, res) => {
 
 // Route for searching blog by title
 
-
-
 //************************* get all blog by author******************************************* */
 
 route.get("/allBlog/:author", async (req, res) => {
-    let exist = await blogController.isBlogExist(req.params.author);
+  let exist = await blogController.isBlogExist(req.params.author);
   if (exist) {
     let data = await blogController.getBlogByAuthor(req.params.author);
 
@@ -113,20 +108,19 @@ route.get("/allBlog/:author", async (req, res) => {
       success: false,
     });
   }
-
-})
+});
 
 //********************************* add blog****************************************** */
 
 route.post("/addBlog", upload.single("image"), async (req, res) => {
   let img;
-if (!req.file) {
-  img = "http://localhost:5000/default.png";
-} else {
-  img = await blogController.getImageBlog(req.file);
-}
-console.log(req.file);
-console.log(req.body);
+  if (!req.file) {
+    img = "http://localhost:5000/default.png";
+  } else {
+    img = await blogController.getImageBlog(req.file);
+  }
+  console.log(req.file);
+  console.log(req.body);
   let blog = new blogModel({
     title: req.body.title,
     body: req.body.body,
@@ -150,78 +144,129 @@ console.log(req.body);
   }
 });
 
-
 //****************************** edit blog ************************************** */
 
-route.put("/editBlog/:id",upload.single("image"), async (req, res) =>  {
-let existBlog=await blogController.isBlogExist(req.params.id);
-if(!existBlog){
+route.put("/editBlog/:id", upload.single("image"), async (req, res) => {
+  let existBlog = await blogController.isBlogExist(req.params.id);
+  if (!existBlog) {
     res.json({
-        message:"blog not found",
-        status:404,
-        success:false
+      message: "blog not found",
+      status: 404,
+      success: false,
     });
-}else{
+  } else {
     let img;
-    if(!req.file){
-        img=existBlog.image;
-    }
-    else{
-        img=await blogController.getImageBlog(req.file);
+    if (!req.file) {
+      img = existBlog.image;
+    } else {
+      img = await blogController.getImageBlog(req.file);
     }
 
-    try{
-         blogModel.findById(req.params.id).then((blog)=>{
-            blog.title=req.body.title;
-            blog.body=req.body.body;
-            blog.image=img;
-            blog.save();
-        });
-        res.json({
-            message:"blog updated",
-            status:200,
-            success:true
-
-        })
-    }catch(error){
-        res.json({
-            message:"error",
-            status:401,
-            success:false
-        }) 
-        console.log(error); 
-        res.status(500).json({ message: "Internal server error" });
-        return; 
+    try {
+      blogModel.findById(req.params.id).then((blog) => {
+        blog.title = req.body.title;
+        blog.body = req.body.body;
+        blog.image = img;
+        blog.save();
+      });
+      res.json({
+        message: "blog updated",
+        status: 200,
+        success: true,
+      });
+    } catch (error) {
+      res.json({
+        message: "error",
+        status: 401,
+        success: false,
+      });
+      console.log(error);
+      res.status(500).json({ message: "Internal server error" });
+      return;
     }
-    
-}
-
+  }
 });
-
 
 //****************** delete blog ******************************************** */
 
 route.delete("/deleteBlog/:id", async (req, res) => {
-    const {id}=req.params;
+  const { id } = req.params;
 
-    blogModel.findByIdAndDelete(id).then((blog)=>{
-        res.json({
-            message:"blog deleted",
-            status:200,
-            success:true
-        })
-    }).catch((error)=>{
-        res.json({
-            message:"error",
-            status:401,
-            success:false
-        })
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
-        return;
+  blogModel
+    .findByIdAndDelete(id)
+    .then((blog) => {
+      res.json({
+        message: "blog deleted",
+        status: 200,
+        success: true,
+      });
     })
-    })
+    .catch((error) => {
+      res.json({
+        message: "error",
+        status: 401,
+        success: false,
+      });
+      console.log(error);
+      res.status(500).json({ message: "Internal server error" });
+      return;
+    });
+});
 
+//******************** Like a Blog  ************************************************************ */
 
+route.post("likeBlog/:id/like", async (req, res) => {
+  const { blogId } = req.params;
+  const userId = req.user._id;
 
-    module.exports=route;
+  try {
+    const existingLike = await blogModel.findOne({
+      _id: blogId,
+      likedBy: userId,
+    });
+
+    if (existingLike) {
+      return res.status(400).json({ message: "You already liked this blog" });
+    }
+
+    const blog = await blogModel.findByIdAndUpdate(
+      blogId,
+      { $addToSet: { likedBy: userId } },
+      { new: true }
+    );
+
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    res.json({ message: "Blog liked successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+//**************************unlike blog *************************************************************** */
+
+route.delete("unlike/:id/unlike", async (req, res) => {
+  const { blogId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const blog = await blogModel.findByIdAndUpdate(
+      blogId,
+      { $pull: { likedBy: userId } },
+      { new: true }
+    );
+
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    res.json({ message: "Blog unliked successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+module.exports = route;

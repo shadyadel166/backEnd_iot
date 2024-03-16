@@ -6,6 +6,9 @@ const bcrypt = require("bcryptjs");
 const { verifyToken } = require("../shared/auth");
 const fs = require("fs");
 let secret= fs.readFileSync("secret.key");
+const blogModel =require ("../models/blog")
+
+
 
 //************* register **************************************************** */
 
@@ -227,8 +230,20 @@ route.get('/search/:query', async (req, res) => {
   }
 });
 
+//*********************************  Get User Likes ******************************************************* */
 
+route.get('getlikeuser/:id/likes', async (req, res) => {
+  const { userId } = req.params;
 
+  try {
+    const likedBlogs = await blogModel.find({ likedBy: userId });
+
+    res.json({ likedBlogs });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 module.exports=route;
