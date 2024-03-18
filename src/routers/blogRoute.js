@@ -121,10 +121,18 @@ route.post("/addBlog", upload.single("image"), async (req, res) => {
   }
   console.log(req.file);
   console.log(req.body);
+  console.log(req.body.likedBy)
+  console.log(req.body.likes)
+  console.log(req.body.comments)
   let blog = new blogModel({
     title: req.body.title,
     body: req.body.body,
     image: img,
+    userId: req.body.userId,
+    likedBy: req.body.userId,
+    likes:req.body.likes,
+    comments:req.body.comments,
+
   });
   try {
     blog = await blog.save();

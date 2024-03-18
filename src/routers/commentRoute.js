@@ -23,7 +23,7 @@ route.get("/comments/:blogId", async (req, res) => {
 });
 
 //************  create comment *********************************************** */
-route.post("/comments", async (req, res) => {
+route.post("/addComment", async (req, res) => {
     try {
         const newComment = req.body;
         const createdComment = await commentController.createComment(newComment);
