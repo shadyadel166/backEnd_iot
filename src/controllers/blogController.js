@@ -36,7 +36,7 @@ async function getImageBlog(file) {
 
 async function getAllBlog() {
   let allBlog = await blogModel.find()
-      .populate({ path: "comments", select: "comment" })
+      .populate({ path: "comments", select: " createdAt" })
       .populate({ path: "likedBy", select: "fullName" })
       .exec();
   return allBlog;
