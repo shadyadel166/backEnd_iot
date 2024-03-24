@@ -105,7 +105,7 @@ route.put("/update/:id", verifyToken, async function (req, res) {
       // let id = data.user._id;
       console.log(req.body);
       console.log(req.params.id);
-      let user = await userController.updateUser(req.params.id, req.body);
+      let user = await userController.updateUser(req.params.id, req.body,data);
       if (user) {
         res.json({
           message: "user updated successfully",
