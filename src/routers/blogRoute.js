@@ -115,7 +115,7 @@ route.get("/allBlog/:author", async (req, res) => {
 route.post("/addBlog", upload.single("image"), async (req, res) => {
   let img;
   if (!req.file) {
-    img = "http://localhost:5000/default.png";
+    img = "http://localhost:8000/default.png";
   } else {
     img = await blogController.getImageBlog(req.file);
   }
@@ -223,10 +223,10 @@ route.delete("/deleteBlog/:id", async (req, res) => {
 
 //******************** Like a Blog  ************************************************************ */
 
-route.post("likeBlog/:id/like", async (req, res) => {
-  const { blogId } = req.params;
+route.get("/likeBlog/:id", async (req, res) => {
+  console.log(req);
+  const  blogId  = req.params;
   const userId = req.user._id;
-
   try {
     const existingLike = await blogModel.findOne({
       _id: blogId,
@@ -255,7 +255,7 @@ route.post("likeBlog/:id/like", async (req, res) => {
 });
 //**************************unlike blog *************************************************************** */
 
-route.delete("unlike/:id/unlike", async (req, res) => {
+route.delete("/unlike/:id/unlike", async (req, res) => {
   const { blogId } = req.params;
   const userId = req.user._id;
 

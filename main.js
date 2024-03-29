@@ -11,7 +11,7 @@
 
 
     //seting the port
-    const port=process.env.PORT || 5000;
+    const port=process.env.PORT || 8000;
 
     //creat the server
     const app=express();

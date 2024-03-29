@@ -8,7 +8,7 @@ const fs = require("fs");
 let secret= fs.readFileSync("secret.key");
 const blogModel =require ("../models/blog")
 
-
+const userModel = require("../models/user");
 
 //************* register **************************************************** */
 
@@ -232,17 +232,140 @@ route.get('/search/:query', async (req, res) => {
 
 //*********************************  Get User Likes ******************************************************* */
 
-route.get('getlikeuser/:id/likes', async (req, res) => {
-  const { userId } = req.params;
+// route.get('getlikeuser/:id', async (req, res) => {
+//   const { userId } = req.params;
+//   console.log(userId);
 
-  try {
-    const likedBlogs = await blogModel.find({ likedBy: userId });
+//   try {
+//     const likedBlogs = await blogModel.find({ likedBy: userId });
 
-    res.json({ likedBlogs });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
+//     res.json({ likedBlogs });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
+
+
+
+
+route.post("/wishlist/toggle", verifyToken, async (req, res) => {
+
+
+  jwt.verify(req.token, secret, async (err, data) => {
+
+    if (err) {
+      res.json({
+        message: "Error:invalid credentials , on token found",
+        status: 401,
+        data: req.token,
+        success: false,
+      });
+    } else {
+      const blogId = req.body._id;
+      const userId = req.body.userId;
+        console.log(userId);
+
+      try {
+        const user = await userModel.findById(userId);
+        const blog = await blogModel.findById(blogId);
+        if (!user) {
+          return res.json({ message: "User not found", status: 400, data: null, success: false,});}
+
+        const existingItem = user.wishLike.find((item) => item._id.toString() === req.body._id);
+
+        if (existingItem) {
+          // Item already exists, remove it
+          user.wishLike = user.wishLike.filter((item) => item._id.toString() !== req.body._id);
+          const blog = await blogModel.findByIdAndUpdate(blogId, {
+            $pull: { likedBy: userId },
+          });
+          const message = "Item removed from wishLike";
+            console.log(message);
+        } else {// Item doesn't exist, add it
+          user.wishLike.push(req.body);
+          blog.likedBy.push(req.body.userId);
+
+          
+          const message = "Item added to wishLike";
+          console.log(message);
+        }
+
+        await user.save();
+        await blog.save();
+        res.json({ message, status: 200, data: user.wishLike, success: true });
+      } catch (error) {
+        console.error(error);
+        res.json({
+          message: "Error updating wishLike",
+          status: 500,
+          data: null,
+          success: false,
+        });
+      }
+    }
+  });
+});
+
+
+//get all wish list items for user
+route.get("/wishlist", verifyToken, async function (req, res) {
+  jwt.verify(req.token, secret, async (err, data) => {
+    if (err) {
+      res.json({ message: "Error:invalid credentials , on token found", status: 401, data: req.token, success: false,});
+    } else {const userId = data.user._id;
+      try {
+        const user = await userModel.findById(userId).populate("wishLike"); // Populate blogs
+        console.log(user)
+        if (!user) {return res.json({message: "User not found",status: 400,data: null,success: false,});}
+        res.json({ message: "All user wishlist", status: 200, data: user.wishLike, success: true });
+      } catch (error) {
+        console.error(error);
+        res.json({
+          message: "Error fetching wishlist",
+          status: 500,
+          data: null,
+          success: false,
+        });
+      }
+    }
+  });
+});
+
+//get all wish list items for user
+route.delete("/wishlist/empty", verifyToken, async function (req, res) {
+  jwt.verify(req.token, secret, async (err, data) => {
+    if (err) {
+      res.json({
+        message: "Error:invalid credentials , on token found",
+        status: 401,
+        data: req.token,
+        success: false,
+      });
+    } else {
+      let id = data.user._id;
+      userModel
+        .findById(id)
+        .then((user) => {
+          user.wishlist = []
+          user.save()
+          res.json({
+            message: "all user wish list",
+            status: 200,
+            data: user.wishlist,
+            success: true,
+          });
+        })
+        .catch((err) => {
+          res.json({
+            message: "user not found",
+            status: 400,
+            data: null,
+            success: false,
+          });
+        });
+    }
+  });
 });
 
 

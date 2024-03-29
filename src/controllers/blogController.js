@@ -27,7 +27,7 @@ async function createBlog(blog) {
   return createBlog;
 }
 async function getImageBlog(file) {
-  let pathLink = "http://localhost:5000/" + file.filename;
+  let pathLink = "http://localhost:8000/" + file.filename;
   return pathLink;
 }
 
