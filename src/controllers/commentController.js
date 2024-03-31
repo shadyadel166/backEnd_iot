@@ -88,7 +88,6 @@ async function getAllCommentByBlogId(id){
     let allComment=await commentModel.find({blogId:id})    
       .populate({ path: "userId", select: "fullName" })
       .exec();
-      console.log(allComment)
       return allComment; 
       
 }

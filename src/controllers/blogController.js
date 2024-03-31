@@ -1,9 +1,12 @@
 const blogModel = require("../models/blog");
 
+// const commentsController = require("../controllers/commentController");
 //**********************  update blog  ******************************************* */
 
 async function updateBlog(id, newData) {
-  let updateBlog = await blogModel.updateOne({ _id: id }, newData);
+  let updateBlog = await blogModel.updateOne({
+    _id: id
+  }, newData);
   return updateBlog;
 }
 
@@ -16,7 +19,9 @@ async function isBlogExist(id) {
 //********************** delete blog **************************************** */
 
 async function deleteBlog(id) {
-  let deleteBlog = await blogModel.deleteOne({ _id: id });
+  let deleteBlog = await blogModel.deleteOne({
+    _id: id
+  });
   return deleteBlog;
 }
 
@@ -32,20 +37,29 @@ async function getImageBlog(file) {
 }
 
 //******************* get blog data**************************** */
+
 //*********************get all blog  *********************************** */
 
 async function getAllBlog() {
   let allBlog = await blogModel.find()
-      .populate({ path: "comments", select: " createdAt" })
-      .populate({ path: "likedBy", select: "fullName" })
-      .exec();
+    .populate({
+      path: "comments",
+      select: "createdAt"
+    })
+    .populate({
+      path: "likedBy",
+      select: "fullName"
+    })
+    .exec()
   return allBlog;
 }
 
 //****************** get blog by id ************************************* */
 
 async function getBlogByID(id) {
-  let blogById = await blogModel.findOne({ _id: id });
+  let blogById = await blogModel.findOne({
+    _id: id
+  });
   return blogById;
 }
 
@@ -53,7 +67,10 @@ async function getBlogByID(id) {
 
 async function getBlogByTitle(title) {
   let blogByTitle = await blogModel.find({
-    title: { $regex: title, $options: "i" },
+    title: {
+      $regex: title,
+      $options: "i"
+    },
   });
   return blogByTitle;
 }
@@ -61,71 +78,101 @@ async function getBlogByTitle(title) {
 //****************** get blog by author ************************************* */
 
 async function getBlogByAuthor(userId) {
-  let blogByUerId = await blogModel.find({ userId: userId });
+  let blogByUerId = await blogModel.find({
+    userId: userId
+  });
   return blogByUerId;
 }
 
 //******************* like blog ************************************************************* */
 
 async function likeBlog(req, res) {
-  const { blogId } = req.params;
+  const {
+    blogId
+  } = req.params;
   const userId = req.user._id;
 
   try {
     const blog = await blogModel.findByIdAndUpdate(blogId, {
-      $addToSet: { likedBy: userId },
+      $addToSet: {
+        likedBy: userId
+      },
     });
 
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(404).json({
+        message: "Blog not found"
+      });
     }
 
-    res.json({ message: "Blog liked successfully" });
+    res.json({
+      message: "Blog liked successfully"
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error"
+    });
   }
 }
 //**************************** unlike ****************************************************** */
 
 async function unlikeBlog(req, res) {
-  const { blogId } = req.params;
+  const {
+    blogId
+  } = req.params;
   const userId = req.user._id;
 
   try {
     const blog = await blogModel.findByIdAndUpdate(blogId, {
-      $pull: { likedBy: userId },
+      $pull: {
+        likedBy: userId
+      },
     });
 
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(404).json({
+        message: "Blog not found"
+      });
     }
 
-    res.json({ message: "Blog unlike successfully" });
+    res.json({
+      message: "Blog unlike successfully"
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error"
+    });
   }
 }
 
 //************************** Get Likes on a Blog ************************************************************* */
 
 async function getBlogLikes(req, res) {
-  const { blogId } = req.params;
+  const {
+    blogId
+  } = req.params;
 
   try {
     const blog = await blogModel.findById(blogId).populate("likedBy");
 
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(404).json({
+        message: "Blog not found"
+      });
     }
 
     const likesCount = blog.likedBy.length;
 
-    res.json({ likes: likesCount });
+    res.json({
+      likes: likesCount
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error"
+    });
   }
 }
 
@@ -135,12 +182,18 @@ async function getUserLikes(req, res) {
   const userId = req.user._id;
 
   try {
-    const likedBlogs = await blogModel.find({ likedBy: userId });
+    const likedBlogs = await blogModel.find({
+      likedBy: userId
+    });
 
-    res.json({ likedBlogs });
+    res.json({
+      likedBlogs
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error"
+    });
   }
 }
 

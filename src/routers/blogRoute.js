@@ -30,6 +30,11 @@ const upload = multer({
 
 route.get("/allBlog", async (req, res) => {
   const blogs = await blogController.getAllBlog();
+  // blogs.forEach(async (blog) => {
+  //   let comts = await commentsController.getAllCommentByBlogId(blog._id)
+  //   blog.comments = comts
+  // })
+
   res.json({
     message: "all blog",
     status: 200,
@@ -130,8 +135,8 @@ route.post("/addBlog", upload.single("image"), async (req, res) => {
     image: img,
     userId: req.body.userId,
     likedBy: req.body.userId,
-    likes:req.body.likes,
-    comments:req.body.comments,
+    likes: req.body.likes,
+    comments: req.body.comments,
 
   });
   try {
@@ -189,7 +194,9 @@ route.put("/editBlog/:id", upload.single("image"), async (req, res) => {
         success: false,
       });
       console.log(error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({
+        message: "Internal server error"
+      });
       return;
     }
   }
@@ -198,7 +205,9 @@ route.put("/editBlog/:id", upload.single("image"), async (req, res) => {
 //****************** delete blog ******************************************** */
 
 route.delete("/deleteBlog/:id", async (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
 
   blogModel
     .findByIdAndDelete(id)
@@ -216,7 +225,9 @@ route.delete("/deleteBlog/:id", async (req, res) => {
         success: false,
       });
       console.log(error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({
+        message: "Internal server error"
+      });
       return;
     });
 });
@@ -225,7 +236,7 @@ route.delete("/deleteBlog/:id", async (req, res) => {
 
 route.get("/likeBlog/:id", async (req, res) => {
   console.log(req);
-  const  blogId  = req.params;
+  const blogId = req.params;
   const userId = req.user._id;
   try {
     const existingLike = await blogModel.findOne({
@@ -234,46 +245,70 @@ route.get("/likeBlog/:id", async (req, res) => {
     });
 
     if (existingLike) {
-      return res.status(400).json({ message: "You already liked this blog" });
+      return res.status(400).json({
+        message: "You already liked this blog"
+      });
     }
 
     const blog = await blogModel.findByIdAndUpdate(
-      blogId,
-      { $addToSet: { likedBy: userId } },
-      { new: true }
+      blogId, {
+        $addToSet: {
+          likedBy: userId
+        }
+      }, {
+        new: true
+      }
     );
 
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(404).json({
+        message: "Blog not found"
+      });
     }
 
-    res.json({ message: "Blog liked successfully" });
+    res.json({
+      message: "Blog liked successfully"
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error"
+    });
   }
 });
 //**************************unlike blog *************************************************************** */
 
 route.delete("/unlike/:id/unlike", async (req, res) => {
-  const { blogId } = req.params;
+  const {
+    blogId
+  } = req.params;
   const userId = req.user._id;
 
   try {
     const blog = await blogModel.findByIdAndUpdate(
-      blogId,
-      { $pull: { likedBy: userId } },
-      { new: true }
+      blogId, {
+        $pull: {
+          likedBy: userId
+        }
+      }, {
+        new: true
+      }
     );
 
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(404).json({
+        message: "Blog not found"
+      });
     }
 
-    res.json({ message: "Blog unliked successfully" });
+    res.json({
+      message: "Blog unliked successfully"
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error"
+    });
   }
 });
 
